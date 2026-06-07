@@ -9,6 +9,7 @@ class Database:
         self.db = None
 
     async def connect(self):
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
         self.db = await aiosqlite.connect(DB_PATH)
         self.db.row_factory = aiosqlite.Row
         await self._create_tables()
