@@ -15,7 +15,12 @@ def embed(
 ):
     e = discord.Embed(title=title, description=description, color=color, timestamp=timestamp)
     if fields:
-        for name, value, inline in fields:
+        for field in fields:
+            if len(field) == 3:
+                name, value, inline = field
+            else:
+                name, value = field
+                inline = False
             e.add_field(name=name, value=value, inline=inline)
     if footer:
         e.set_footer(text=footer)

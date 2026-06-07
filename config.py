@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-OWNER_ID = int(os.getenv("OWNER_ID", "0"))
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN") or os.getenv("TOKEN") or ""
+OWNER_ID = int(os.getenv("OWNER_ID") or os.getenv("OWNER") or "1513129431214854236")
 REPORT_CHANNEL_ID = int(os.getenv("REPORT_CHANNEL_ID", "0"))
 
 EMBED_COLOR = 0x5865F2
