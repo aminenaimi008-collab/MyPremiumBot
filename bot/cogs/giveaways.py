@@ -6,7 +6,7 @@ import random
 import asyncio
 import config
 from bot.database import db
-from bot.utils.helpers import embed, error_embed, success_embed
+from bot.utils.helpers import embed, error_embed, success_embed, is_premium
 
 
 class GiveawayView(View):
@@ -23,7 +23,7 @@ class GiveawayView(View):
             await interaction.response.send_message(embed=error_embed("❌ Giveaway not found or ended."), ephemeral=True)
             return
 
-        participant = await db.execute(
+        participant = await db.fetchone(
             "SELECT * FROM giveaway_participants WHERE giveaway_id = ? AND user_id = ?",
             [giveaway["id"], interaction.user.id],
         )
@@ -125,6 +125,15 @@ class Giveaways(commands.Cog):
         if not seconds or seconds < 10:
             await ctx.send(embed=error_embed("❌ Invalid duration. Use format: 1h, 30m, 1d, 2d12h"))
             return
+
+        if not await is_premium(ctx.guild.id):
+            active = await db.fetchone(
+                "SELECT COUNT(*) as count FROM giveaways WHERE guild_id = ? AND ended = 0",
+                [ctx.guild.id],
+            )
+            if active["count"] >= 1:
+                await ctx.send(embed=error_embed("❌ Free servers can only have **1 active giveaway**. Upgrade to Premium for unlimited!"))
+                return
 
         ends_at = time.time() + seconds
 

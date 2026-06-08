@@ -5,7 +5,7 @@ import math
 import random
 import config
 from bot.database import db
-from bot.utils.helpers import embed, error_embed, success_embed
+from bot.utils.helpers import embed, error_embed, success_embed, is_premium
 
 XP_PER_MESSAGE = random.randint(10, 25)
 XP_COOLDOWN = 60
@@ -183,6 +183,8 @@ class Economy(commands.Cog):
 
         bonus = min(streak * 10, 100)
         coins = 50 + bonus
+        if await is_premium(ctx.guild.id):
+            coins *= 2
 
         econ_row = await db.fetchone(
             "SELECT balance FROM economy WHERE user_id = ? AND guild_id = ?",

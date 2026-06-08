@@ -1,5 +1,30 @@
 import discord
 import config
+import time
+from bot.database import db
+
+
+async def is_premium(guild_id: int) -> bool:
+    row = await db.fetchone(
+        "SELECT premium_until FROM guild_config WHERE guild_id = ?", [guild_id],
+    )
+    if not row or row["premium_until"] == 0:
+        return False
+    return time.time() < row["premium_until"]
+
+
+async def require_premium(ctx) -> bool:
+    if await is_premium(ctx.guild.id):
+        return True
+    await ctx.send(embed=premium_embed(
+        "✨ This feature requires **Premium**!\n\n"
+        "Get Premium from the server owner to unlock:\n"
+        "• Unlimited giveaways\n"
+        "• Custom prefix\n"
+        "• Advanced logs\n"
+        "• And more!"
+    ))
+    return False
 
 
 def embed(
